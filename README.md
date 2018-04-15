@@ -1,4 +1,4 @@
-# Simple Student Web Server-Client 
+# Simple Student Web Server Client 
 
 In this repo, we used: 
 
@@ -6,7 +6,8 @@ In this repo, we used:
 * use `express-generator`, to quickly create an application skeleton
 * use `google chart api` to draw chart
 * use `sendgrid` for transactional email
-* use `tailwind css` for css   
+* use `tailwind css` for css
+* use `sequelize` and `mysql` for database
 
 ### What's in the download?
 The download includes :
@@ -14,27 +15,42 @@ The download includes :
 Skeleton/
 ├── README.md
 ├── apps.js
+├── gulpfile.js
 ├── package.json
-├── crud.sql
 ├── bin
 │   └── www
 ├── public
 │   └── stylesheets
 │        └── style.css
 ├── routes
+│   ├── admin.js
 │   ├── index.js
-│   └── input.js
+│   ├── login.js
+│   ├── register.js
+│   ├── statistic.js
+│   ├── students.js
+│   └── users.js
+├── src
+│   ├── db_connect.js
+│   ├── joi_student.js
+│   ├── model_students.js
+│   ├── model_users.js
+│   └── seq_db_connect.js
 └── views
-    ├── error.pug
-    ├── index.pug
+    ├── adminList.pug
     ├── edit.pug
+    ├── error.pug
     ├── forgot.pug
-    ├── inputUser.pug
-    ├── login.pug
+    ├── index.pug
     ├── input.pug
-    ├── input.html
+    ├── inputUser.pug
+    ├── layout.pug
+    ├── login.pug 
+    ├── register_next.pug
+    ├── register.pug
+    ├── reset.pug
     ├── statistic.pug
-    └── layout.pug
+    └── students.pug
 ```
 ### How to Use
 1. Make sure you have installed `npm` in your PC
@@ -47,9 +63,9 @@ Skeleton/
 6. Update the development environment with your `SENDGRID_API_KEY`, for example:
     ```
     echo "export SENDGRID_API_KEY='YOUR_API_KEY'" > sendgrid.env
-    echo "sendgrid.env" >> .gitignore
-    source ./sendgrid.env
-    ```
+   echo "sendgrid.env" >> .gitignore
+   source ./sendgrid.env
+   ```
 7. Download file in this repo or clone this repo, with command :
     `https://github.com/Qisti/CRUD-HTML-NodeJs`
 8. Import `crud.sql` to your database 
