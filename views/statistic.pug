@@ -1,0 +1,48 @@
+extends layout
+
+block content
+  h1.font-bold.text-center.text-xl.m-4  Statistic Students
+  script(type='text/javascript', src='https://www.gstatic.com/charts/loader.js')
+    script(type='text/javascript', src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+    script(type='text/javascript').
+    
+      // Load the Visualization API and the piechart package.
+      google.charts.load('current', {'packages':['corechart']});
+        
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+        
+      function drawChart() { 
+        var data2 = new google.visualization.arrayToDataTable(!{obj2});
+        var options2 = {'title':'Gender Comparison',
+                       'width':1000,
+                       'height':600};
+        var chart2 = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart2.draw(data2, options2);
+
+        var data1 = new google.visualization.arrayToDataTable(!{obj1});
+        var options1 = {'title': 'Data inserted by month',
+                        'curveType': 'function',
+                        'height': 600,
+                        'weight': 1000
+                       };
+        var chart1 = new google.visualization.AreaChart(document.getElementById('linechart'));
+        chart1.draw(data1, options1);
+      }
+  body
+    #piechart
+    form.form-inline.m-4(action='/statistic/', method='GET')
+      .relative.align-middle
+        select#year.border.text-grey-darker.h-10.m-1.rounded(name='year')
+          option#year(value='2018', name='year') 2018
+          option#year(value='2017', name='year') 2017
+          option#year(value='2016', name='year') 2016
+          option#year(value='2015', name='year') 2015
+          option#year(value='2014', name='year') 2014
+          option#year(value='2013', name='year') 2013
+          option#year(value='2012', name='year') 2012
+        button.btn.btn-outline-success.m-2.my-sm-0.rounded(type='submit') Search Year
+    #linechart
+    
+    
+    

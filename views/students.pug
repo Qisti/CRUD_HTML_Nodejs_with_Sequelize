@@ -1,0 +1,47 @@
+extends layout
+
+block content
+      h1.font-bold.text-center.text-xl.m-4  Student List
+      form.form-inline.m-4(action='/students/filter', method='POST')
+        input.form-control.mr-sm-2(type='text', placeholder='Keyword', name='search')
+        .relative
+          select#basedOn.text-grey-darker.border.h-10.m-1.rounded(name='basedOn')
+            option#basedOn(value='id_student') Id Student
+            option#basedOn(value='name') Name
+            option#basedOn(value='mail') Email
+            option#basedOn(value='address') Address
+        .relative
+          select#order.border.text-grey-darker.h-10.m-1.rounded(name='order')
+            option#order(value='asc') Ascending
+            option#order(value='desc') Descending
+        button.btn.btn-outline-success.m-2.my-sm-0.rounded(type='submit') Search
+      table.table.m-4(border='1 px')
+        thead.thead-dark.font-bold
+          tr
+            td Student Id
+            td Name
+            td(scope='col') Gender
+            td(scope='col') Date of Birth
+            td(scope='col') Address
+            td(scope='col') Mail
+            td(scope='col') Date of Entry
+            td
+            td 
+        tbody
+          for student in data
+            tr
+              td= student.id_student
+              td= student.name
+              td= student.gender
+              td= student.date_of_birth
+              td= student.address
+              td= student.mail
+              td= moment(student.date_of_entry).format('DD-MM-YYYY')
+              td
+                form(action='/update'+student.id_student)
+                  input.bg-blue-dark.text-white.font.py-2.px-4.rounded(class='hover:bg-blue-light', type='submit', value='Update')
+              td
+                form(action='/students/delete/'+student.id_student, method='POST')
+                  input.bg-red-light.text-white.font.py-2.px-4.rounded(class='hover:bg-red-dark', type='submit', value='Delete', onClick="return confirm_delete()")
+              
+                  
