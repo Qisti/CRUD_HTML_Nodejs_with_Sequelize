@@ -31,9 +31,9 @@ router.get('/setting', function(req, res, next) {
   // }).catch()
 
   var status = req.body.status;
-  var newSecret = twoFactor.generateSecret({name: 'Setting', account: username})
+  var newSecret = twoFactor.generateSecret({name: 'Setting', account: req.user.username})
   console.log(newSecret);
-  console.log(username)
+  console.log(req.user.username)
   // var qrcode = qr.imageSync(newSecret.uri, { type: 'png' })
   res.render('setting', {qrcode: newSecret.qr, secret_key: newSecret.secret})
 });
