@@ -32,6 +32,9 @@ const register = require('./routes/register')
 
 const student = require('./src/model_students');
 const user = require('./src/model_users');
+var twoFactor = require('node-2fa');
+const qr = require('qr-image')
+
 // var edit = require('./routes/edit');
 
 // view engine setup
@@ -58,6 +61,15 @@ app.use(validator());
 //   offset: expressJoi.Joi.types.Number().integer().min(0).max(25),
 //   name: expressJoi.Joi.types.String().alphanum().min(2).max(25)
 // };
+
+// var newSecret = twoFactor.generateSecret({name: 'users', account: 'username'})
+// var newToken = twoFactor.generateToken('2RIG7RJDDALIR2BCPAX7JNJ4MXICSC7Z')
+
+// app.get('/coba', function(req, res, next) {
+//   console.log(newSecret);
+//   var qrcode = qr.image(newSecret.uri)
+//   res.send(qrcode);
+// })
 
 var sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -86,48 +98,53 @@ passport.use('local', new LocalStrategy({
       alert('Username or password required are required !');
       return done(null, false);
     } 
-    
-    // user.findOne({ 
-    //   where: {
-    //     username: username,
-    //     password: pass
-    //   }
-    // })
-    // .then(function(user) {
-    //   if(user) {
-    //     alertNode('You entered duplicate username or email!');
-    //   } else {
-    //     user.create(insertUsers)
-    //     .then(newUser => {
-    //       console.log(`New User ${newUser.username}, with id ${newUser.id} has been created.`);
-    //       res.redirect('/');
-    //     })
-    //   }
-    // });
 
-    connection.query("select * from users where username = ?", [username], function(err, rows){
-      console.log(rows);
-      if (err) return done(req.flash('message',err));
-      if(rows.length<0){ 
-        alert('Invalid username or password !');
-        return done(null, false); 
+    user.findAll({
+      where: {
+        username: [username]
       }
+    }).then(function(rows, err) {
+      if(!rows.length){ return done(null, false, req.flash('message','Invalid username.')); }
+      var dbPassword  = rows[0].password;
+      console.log('dbpw = ', dbPassword)
+      console.log('pass = ', password)
+      console.log(username);
       salt = config.salt+''+password;
       var encPassword = crypto.createHash('sha1').update(salt).digest('hex');
       var dbPassword  = rows[0].password;
-
       if(!(dbPassword == encPassword)){
         if(err) throw err;
         alert('Invalid username or password'); 
         return done(null, false);
       }
       return done(null, rows[0]);
-    });
+    }).catch(function(err) {
+      console.log(err)
+    })
+
+    // connection.query("select * from users where username = ?", [username], function(err, rows){
+    //   console.log(rows);
+    //   if (err) return done(req.flash('message',err));
+    //   if(rows.length<0){ 
+    //     alert('Invalid username or password !');
+    //     return done(null, false); 
+    //   }
+    //   salt = config.salt+''+password;
+    //   var encPassword = crypto.createHash('sha1').update(salt).digest('hex');
+    //   var dbPassword  = rows[0].password;
+
+    //   if(!(dbPassword == encPassword)){
+    //     if(err) throw err;
+    //     alert('Invalid username or password'); 
+    //     return done(null, false);
+    //   }
+    //   return done(null, rows[0]);
+    // });
   }
   ));
 
-passport.serializeUser(function(username, done){
-  done(null, username.id_user);
+passport.serializeUser(function(user, done){
+  done(null, user.id);
 });
 
 passport.deserializeUser(function(id_user, done){
@@ -136,6 +153,7 @@ passport.deserializeUser(function(id_user, done){
     done(null, user);
   });
 });
+
 
 app.get('/',function(req,res){
   res.render('login');

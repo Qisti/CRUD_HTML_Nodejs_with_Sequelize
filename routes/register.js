@@ -11,6 +11,10 @@ const moment = require('moment');
 const alert = require('alert-node');
 const connection = require('../src/db_connect');
 const config = require('../conf/config');
+const Sequelize = require('sequelize');
+const sequelize = require('../src/seq_db_connect');
+const user = require('../src/model_users');
+
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -49,15 +53,19 @@ app.get('/', function(req, res) {
           }
   
           console.log(resetPswd);
-  
-        //   connection.query('update users set ? where email = ?', [resetPswd, email], function(err, rows) {
-        //     if(err) throw err;
-        //     console.log("token di set token :", swd_token);
-        //     console.log(rows);
-        //     done(err, token, rows);
-        //     alert("Check your email to verify your email!");
-        //   });
-        
+          
+          // var insertUser = {
+          //   username: req.body.username,
+          //   email: req.body.email,
+          //   pswd_token: swd_token,
+          //   date_reset: ate_reset
+          // }; 
+
+          // user.create(insertUser)
+          //  .then(function(res, err) {
+          //   alert('Check your email to verify your account!') 
+          //   done(err, res);
+          //  })
         connection.query('INSERT INTO users (username, email, pswd_token) VALUES (? , ?, ? )', [username, email, swd_token], function(err, res) {
               if(err) console.log("ERRRR2");
               console.log('Insert email sama username ke tabel user');
@@ -126,7 +134,6 @@ app.get('/', function(req, res) {
         var spassword = config.salt+''+password;
         var dpassword = crypto.createHash('sha1').update(spassword).digest('hex')
 
-        // var val = validator_email.validate(email);
 
         connection.query('UPDATE users SET password = ? WHERE username = ?', [dpassword, username], function(err, res) {
             if (err) console.log("ERR4");
@@ -135,18 +142,6 @@ app.get('/', function(req, res) {
             
         });
         // res.redirect('/students');
-  
-        //   var reset = {pswd_token: swd_token, date_reset: ate_reset}
-        //   connection.query('INSERT INTO users (username, password, email) VALUES ', [username, spassword, email], function(err, rows) {
-        //     if(err) console.log("ERRRRRR");
-        //     console.log("berhasil register")
-        //     console.log("rows", rows);
-        //   });
-  
-        //   console.log(username);
-        //   connection.query('select * from users where username = ?', [username], function(err, rows) {
-        //     done(err, rows);
-        //   });
         });
       },
       function(rows, done) {
@@ -164,7 +159,8 @@ app.get('/', function(req, res) {
       }, 
       ], function(err) {
        if (err) return next(err);
-        res.redirect('/login/proseslogin');
+        res.render('/students');
+      })
       //   passport.authenticate('local', {
       //     successRedirect: '/students',
       //     failureRedirect: '/login',
@@ -174,8 +170,9 @@ app.get('/', function(req, res) {
       //     console.log("gimana ini?")
       //     // res.redirect('/students');
       // }
-      })
-      // res.('/login/proseslogin');
+      
+      // res.redirect('/students');
+      
   });
 
 module.exports = app;

@@ -9,6 +9,7 @@ const validator = require('express-validator');
 const validator_email = require('email-validator');
 const sequelize = require('../src/seq_db_connect');
 const student = require('../src/model_students');
+const user = require('../src/model_users')
 
 function getStudentGender(studentGender){
   if(studentGender === 'f'){
@@ -39,7 +40,7 @@ router.get('/', function(req, res) {
   var studentList = [];
 
   student.findAll().then(function(rows) {
-    // res.send(rows);
+    // res.send(rows)
     res.render('index', {title: 'Student List', data: rows} )
   })
     .catch(err => {

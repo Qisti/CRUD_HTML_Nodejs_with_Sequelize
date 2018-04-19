@@ -1,0 +1,37 @@
+extends layout2
+
+block content
+  h1.font-bold.text-center.text-xl.m-4 Setting
+  p.text-center
+    | Use two-factor authentication
+  form.text-center
+    input#enable.bg-blue-dark.text-white.font.py-2.px-4.rounded.m-4(class='hover:bg-blue-light', type='button', value='Enable')
+    input#disable.bg-blue-dark.text-white.font.py-2.px-4.rounded(class='hover:bg-blue-light', type='button', value='Disable')
+  .set.items-center
+    .rounded.items-center
+      form.m-4.items-center(action='#', method='POST')
+        table.w-full.m-4.max-w-md
+          tr
+            td(colspan='3') In order for third-party applications to run, scan the QR code below or tap the secret key directly in the app :
+          tr.m-4
+            td QR Code
+            td
+              img(src=qrcode, alt='QR Code')
+            td
+              input(type="text", name='user', value=user)
+          tr.m-4
+            td Secret Key
+            td
+              input#secret_key.form-control.w-full(type='text', name='secret_key', value=secret_key, readonly)
+            td 
+              a.m-2(href='/admin/refresh') Refresh 
+          tr
+            td(colspan='3') To confirm that the third-party app has been properly set up, enter the security code displayed on your phone. 
+          tr
+            td Security Code     
+            td
+              input#security_code.form-control.w-full(type='text', name='security_code', required)
+        input.bg-blue-dark.text-white.font.py-2.px-4.rounded.m-4(class='hover:bg-blue-light', type='submit', value='Save Setting', onClick='return confirm_set()')
+        
+    
+    

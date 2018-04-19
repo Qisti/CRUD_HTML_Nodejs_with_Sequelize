@@ -7,10 +7,92 @@ const validator_email = require('email-validator');
 const Sequelize = require('sequelize');
 const sequelize = require('../src/seq_db_connect');
 const user = require('../src/model_users');
+const path = require('path');
+var qr = require('qr-image');
 
+var QRCode = require('qrcode');
+
+const twoFactor = require('node-2fa');
+
+
+// var newSecret = twoFactor.generateSecret({name: 'users', account: 'username'})
+
+// router.get('/coba', function(req, res, next) {
+//   console.log(newSecret);
+//   var code = qr.image(newSecret.uri)
+//   res.send(code);
+// })
+
+router.get('/setting', function(req, res, next) {
+  // user.findAll({
+    
+  // }).then(function(usr, err) {
+
+  // }).catch()
+
+  var status = req.body.status;
+  var newSecret = twoFactor.generateSecret({name: 'Setting', account: username})
+  console.log(newSecret);
+  console.log(username)
+  // var qrcode = qr.imageSync(newSecret.uri, { type: 'png' })
+  res.render('setting', {qrcode: newSecret.qr, secret_key: newSecret.secret})
+});
+
+
+router.post('/setting', function(req, res, next) {
+  console.log(user.username)
+  // user.findOne({
+  //   where: {username: req.user.username}
+  // }).then(function(usr, err) {
+  //   console.log(usr)
+  // }).catch(err => {console.error(err)})
+
+  console.log(req.body.username)
+  user.findAll({
+    where: {
+      username: [req.body.username]
+    }
+  }).then(function(rows) {
+    var verifytoken = twoFactor.verifyToken(rows[0].secretkey, req.body.token);
+    console.log(req.body.token)
+    var newToken = twoFactor.generateToken(rows[0].secretkey)
+    console.log(newToken)
+    if (verifytoken !== null) {
+      users.findOne({
+        where: {
+          username: [req.body.username]
+        },
+        attributes: ['id', 'username', 'password']
+      }).then(user => 
+        req.login(user, function (err) {
+          if (err) {
+            console.log('user',user)
+            return res.redirect('back');
+          }
+          console.log('Logged user in using Passport req.login()');
+          console.log('username',req.user.username);
+          res.redirect('/')
+        })
+      ) 
+    } else {
+      console.log('wrong token')
+      res.render('setting',{stoken: req.body.token, susername: req.body.username})
+    }
+  }).catch(error => {
+    console.log('salah')
+    res.render('setting',{stoken: req.body.token, susername: req.body.username})
+  })
+
+
+})
+
+router.get('/refresh', function(req, res, next) {
+  res.redirect('/admin/setting');
+})
 
 router.get('/list', function(req, res) {
     var adminList = [];
+    console.log(req.user.username)
     user.findAll().then(function(rows) {
     // res.send(rows);
     res.render('adminList', {title: 'Admin List', data: rows} )
@@ -20,6 +102,12 @@ router.get('/list', function(req, res) {
       });
 
 });
+
+router.post('/twofactor/setup', function(req, res) {
+  const secret = twoFactor.generateSecret({length: 10});
+  QRCode.toDataURL(secret)
+})
+
 
 router.post('/add', function(req, res) {
   // req.checkBody("id_student",'input name').notEmpty();  

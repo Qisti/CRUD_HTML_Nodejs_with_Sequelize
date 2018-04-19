@@ -15,6 +15,7 @@ const config = require('../conf/config');
 const Sequelize = require('sequelize');
 const sequelize = require('../src/seq_db_connect');
 const user = require('../src/model_users');
+const twoFactor = require('node-2fa');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -22,6 +23,41 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 app.get('/', function(req, res){
     res.render('login')
 });
+
+// router.get('/', function(req, res){
+//   if (req.isAuthenticated()) {
+//     res.redirect('/');
+//   } else {
+//   res.render('login');
+//   };
+// });
+
+
+// router.get('/', function(req, res, next) {
+//   passport.authenticate('local', function(err, user, info) {
+//     console.log(req.query.username)
+//     if (err) { return next(err); }
+//     if (!user) { return res.redirect('/login'); }
+//     users.findAll({
+//       where: {
+//         username: req.query.username
+//       }
+//     }).then(function(rows) {
+//       console.log(rows[0].two_fa)
+//       if (rows[0].two_fa === 'disable') {
+//         req.logIn(user, function(err) {
+//           if (err) { return next(err); }
+//           console.log('sukses login')
+//           return res.redirect('/' );
+//         });
+//       } else {
+//         req.flash('username',req.query.username)
+//         res.redirect('/two_fa/')
+//       }
+//     })
+//   })(req, res, next);
+// });
+
 
 app.post('/proseslogin', passport.authenticate('local', {
     successRedirect: '/students',
@@ -63,39 +99,39 @@ app.post('/setPassword', function(req, res, next) {
           var resetPswd = {
             pswd_token: swd_token, date_reset: ate_reset
           }
-          var insertUser = {
-            username: req.body.username,
-            email: req.body.email,
-            pswd_token: swd_token,
-            date_reset: ate_reset
-          };
+          // var insertUser = {
+          //   username: req.body.username,
+          //   email: req.body.email,
+          //   pswd_token: swd_token,
+          //   date_reset: ate_reset
+          // };
 
-          user.findOne({
-            where: {
-              username: username,
-              email: email
-            }
-          }).then(function(User, err) {
-            if (User) {
-              alert('This username or email has already used!');
-            } else {
-              user.create(insertUser)
-               .then(function(User, err) {
-                 done(err, token, User)
-               })
-            }
-          })
+          // user.findOne({
+          //   where: {
+          //     username: username,
+          //     email: email
+          //   }
+          // }).then(function(User, err) {
+          //   if (User) {
+          //     alert('This username or email has already used!');
+          //   } else {
+          //     user.create(insertUser)
+          //      .then(function(User, err) {
+          //        done(err, token, User)
+          //      })
+          //   }
+          // })
   
           // console.log(resetPswd);
   
-          // connection.query('update users set ? where email = ?', [resetPswd, email], function(err, rows) {
-          //   if(err) throw err;
-          //   console.log("token di set token :", swd_token);
-          //   console.log(rows);
-          //   done(err, token, rows);
-          //   // alert("Check your email to reset password !");
-          // });
-        // res.redirect('/login')
+          connection.query('update users set ? where email = ?', [resetPswd, email], function(err, rows) {
+            if(err) throw err;
+            console.log("token di set token :", swd_token);
+            console.log(rows);
+            done(err, token, rows);
+            // alert("Check your email to reset password !");
+          });
+        res.redirect('/login')
         });  
       },
       function(token, rows, done) {
