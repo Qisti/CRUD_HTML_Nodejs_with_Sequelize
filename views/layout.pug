@@ -26,24 +26,24 @@ html
 
   body.col-md-auto.p-4.flex.mb-4.my-4
       .rounded.overflow-hidden.justify-center.shadow-lg.w-full.h-full
-        nav.flex.items-center.justify-between.bg-blue-dark.p-2
+        nav.flex.items-center.justify-between.bg-indigo-dark.p-2
          .w-full.block.flex-grow(class='lg:flex lg:items-center lg:w-auto')
           .text-sm.mb-2(class='lg:flex-grow')
-            a.block.mt-2.text-white.mr-4.ml-4(href='/students', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4.ml-4(href='/students', class='lg:inline-block lg:mt-0 hover')
               | Home
-            a.block.mt-2.text-white.mr-4(href='/statistic/?year=2018', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/statistic/?year=2018', class='lg:inline-block lg:mt-0 hover')
               | Statistic
-            a.block.mt-2.text-white.mr-4(href='/students', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/students', class='lg:inline-block lg:mt-0 hover')
               | Student List
-            a.block.mt-2.text-white.mr-4(href='/input', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/input', class='lg:inline-block lg:mt-0 hover')
               | Add Student
-            a.block.mt-2.text-white.mr-4(href='/addUser', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/addUser', class='lg:inline-block lg:mt-0 hover')
               | Add Admin
-            a.block.mt-2.text-white.mr-4(href='/admin/list', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/admin/list', class='lg:inline-block lg:mt-0 hover')
               | Admin List
-            a.block.mt-2.text-white.mr-4(href='/admin/setting', class='lg:inline-block lg:mt-0 hover:text-blue-lightest')
+            a.block.mt-2.text-white.mr-4(href='/admin/setting', class='lg:inline-block lg:mt-0 hover')
               | Setting
           .flex.justify-right
-            a.block.mt-2.text-white.mr-4(class='lg:inline-block lg:mt-0 hover:text-blue-lightest', href='/login', method='GET', onClick='return confirm_logout()')
+            a.block.mt-2.text-white.mr-4(class='lg:inline-block lg:mt-0 hover:text-blue-light', href='/login', method='GET', onClick='return confirm_logout()')
               | Logout
         block content

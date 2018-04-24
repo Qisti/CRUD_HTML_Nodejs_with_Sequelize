@@ -24,62 +24,15 @@ app.get('/', function(req, res){
     res.render('login')
 });
 
-// router.get('/', function(req, res){
-//   if (req.isAuthenticated()) {
-//     res.redirect('/');
-//   } else {
-//   res.render('login');
-//   };
-// });
-
-
-// app.get('/proseslogin', passport.authenticate('local', {
-//     successRedirect: '/students',
-//     failureRedirect: '/login',
-//     failureFlash: true
-// }), function(req, res, next){
-
-//     // res.redirect('/students');
-// });
-
-app.get('/proseslogin', function(req, res, next) {
-  passport.authenticate('local', function(err, users, info) {
-    console.log("coba", req.query.username)
-    if (err){ return next(err) }
-    if (!user) {
-      return res.redirect('/login');
-    }
-    user.findAll({
-      where: {
-        username: req.query.username
-      }
-    }).then(function(rows) {
-      console.log("STATUSNYA ",rows[0].two_fa)
-      if(rows[0].two_fa === 'disable') {
-        req.logIn(users, function(err) {
-          console.log(users)
-          if(err) { return next(err); }
-          return res.redirect('/students');
-        });
-      } else {
-        res.redirect('/login/two-fa')
-      }
-    })
-  })(req, res, next);
-  // res.send("COBA")
-})
-
-app.get('/two-fa', function(req, res, next) {
+router.get('/two-fa', function(req, res) {
   // console.log("gak bisa masuk")
-  console.log('username ',req.params.username )
-   var f = req.flash('username');
-   console.log("usernamenya adalah : ",f.toString())
-  // console.log(req.query.username)
-   res.render('two_fa', {username: f.toString()})
+  // // console.log('username ',req.params.username )
+  //  var f = req.flash('username');
+  //  console.log(f.toString())
+   res.render('two_fa')
  })
 
-
-app.post('/two_fa', function(req, res) {
+router.post('/two_fa', function(req, res) {
   console.log(req.body.username)
   user.findAll({
     where: {
@@ -112,9 +65,6 @@ app.post('/two_fa', function(req, res) {
   })
 })
 
-app.get('/forgot', function(req, res) {
-    res.render('forgot');
-});
 
 app.post('/setPassword', function(req, res, next) {
     var email = req.body.email;
@@ -289,58 +239,6 @@ app.get('/reset/:token', function(req, res){
       }
       ], function(err) {
        if (err) throw err;
-        res.redirect('/');
-      })
-  })
-
-  app.post('/reset/:token', function(req, res) {
-    var username = req.body.username;
-    console.log(username);
-    async.waterfall ([
-      function(done) {
-        connection.query('SELECT * from users where pswd_token = ?', [req.params.token], function(err, rows) {
-          if(rows.length <=0){
-            alert("Email not registered !");
-            console.log("email belum terdaftar")
-          }
-          console.log("hasil select 2", rows);
-          
-          var swd_token = undefined;
-          var ate_reset = undefined;
-          var spassword = req.body.password;
-          var spassword2 = req.body.password2;
-          spassword = config.salt+''+spassword;
-          console.log(rows[0].email);
-          var email = rows[0].email;
-  
-          var reset = {pswd_token: swd_token, date_reset: ate_reset}
-          connection.query('UPDATE users SET password = sha1(" ? "), ? WHERE email = ? ', [password, reset, email], function(err, rows) {
-            if(err) throw err;
-            console.log("berhasil set password baru")
-            console.log("rows", rows);
-          });
-  
-          console.log(username);
-          connection.query('select * from users where username = ?', [username], function(err, rows) {
-            done(err, rows);
-          });
-        });
-      },
-      function(rows, done) {
-        console.log("yang ke 3 :", rows)
-        var optnMsg = {
-          to: rows[0].email,
-          from: config.message.from,
-          subject: config.message.subject_success,
-          text: config.message.text_confirm
-        };
-        sgMail.send(optnMsg, function(err) {
-          console.log("email sudah dikirim");
-          done(err, 'done');
-        });
-      }
-      ], function(err) {
-       if (err) return next(err);
         res.redirect('/');
       })
   })

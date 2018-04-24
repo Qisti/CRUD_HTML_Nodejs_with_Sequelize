@@ -91,8 +91,8 @@ var pass;
 passport.use('local', new LocalStrategy({
   username: 'username',
   password: 'password',
-
-  passReqToCallback: true} , 
+  passReqToCallback: true
+} , 
   function (req, username, password, done){
     if(!username || !password ) { 
       alert('Username or password required are required !');
@@ -116,48 +116,43 @@ passport.use('local', new LocalStrategy({
         if(err) throw err;
         alert('Invalid username or password'); 
         return done(null, false);
+      } else {
+        return done(null, rows[0]);
       }
-      return done(null, rows[0]);
+      
     }).catch(function(err) {
       console.log(err)
     })
-
-    // connection.query("select * from users where username = ?", [username], function(err, rows){
-    //   console.log(rows);
-    //   if (err) return done(req.flash('message',err));
-    //   if(rows.length<0){ 
-    //     alert('Invalid username or password !');
-    //     return done(null, false); 
-    //   }
-    //   salt = config.salt+''+password;
-    //   var encPassword = crypto.createHash('sha1').update(salt).digest('hex');
-    //   var dbPassword  = rows[0].password;
-
-    //   if(!(dbPassword == encPassword)){
-    //     if(err) throw err;
-    //     alert('Invalid username or password'); 
-    //     return done(null, false);
-    //   }
-    //   return done(null, rows[0]);
-    // });
   }
   ));
+
+  // app.get('/two-fa', function(req, res) {
+  //   console.log("gak bisa masuk")
+  //   // console.log('username ',req.params.username )
+  //    var f = req.flash('username');
+  //    console.log(f.toString())
+  //    res.render('two_fa')
+  //  })
 
 passport.serializeUser(function(user, done){
   done(null, user.id_user);
 });
 
 passport.deserializeUser(function(id_user, done){
-  connection.query("select * from users where id_user = ? ", [id_user], function (err, user){
-    if (err) return done(err);  
-    done(null, user);
-  });
+  user.findAll({
+    where: {
+      id_user: [id_user]
+    }
+  }).then(function(rows, err) {
+    done(err, rows[0])
+  })
 });
 
 
 app.get('/',function(req,res){
   res.render('login');
 });
+
 
 function isAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {

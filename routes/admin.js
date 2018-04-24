@@ -24,67 +24,109 @@ const twoFactor = require('node-2fa');
 // })
 
 router.get('/setting', function(req, res, next) {
-  // user.findAll({
-    
-  // }).then(function(usr, err) {
+  user.findAll({
+    where: {
+      username: [req.user.username]
+    }
+  }).then(function(rows) {
+    // console.log(req.user.username)
+    var newSecret = twoFactor.generateSecret({name: 'Setting', account: req.user.username})
+    res.render('setting', {stwo_fa: rows[0].two_fa, qrcode: newSecret.qr, secret_key: newSecret.secret})
+  })
 
-  // }).catch()
-
-  var status = req.body.status;
-  var newSecret = twoFactor.generateSecret({name: 'Setting', account: req.user.username})
-  console.log(newSecret);
-  console.log(req.user.username)
-  // var qrcode = qr.imageSync(newSecret.uri, { type: 'png' })
-  res.render('setting', {qrcode: newSecret.qr, secret_key: newSecret.secret})
+  // var status = req.body.status;
+  // var newSecret = twoFactor.generateSecret({name: 'Setting', account: req.user.username})
+  // console.log(newSecret);
+  // console.log(req.user.username)
+  // // var qrcode = qr.imageSync(newSecret.uri, { type: 'png' })
+  // res.render('setting', {qrcode: newSecret.qr, secret_key: newSecret.secret})
 });
 
 
-router.post('/setting', function(req, res, next) {
-  console.log(user.username)
-  // user.findOne({
-  //   where: {username: req.user.username}
-  // }).then(function(usr, err) {
-  //   console.log(usr)
-  // }).catch(err => {console.error(err)})
+// router.post('/setting', function(req, res, next) {
+//   console.log(user.username)
+//   // user.findOne({
+//   //   where: {username: req.user.username}
+//   // }).then(function(usr, err) {
+//   //   console.log(usr)
+//   // }).catch(err => {console.error(err)})
 
-  console.log(req.body.username)
-  user.findAll({
-    where: {
-      username: [req.body.username]
+//   console.log(req.body.username)
+//   user.findAll({
+//     where: {
+//       username: [req.body.username]
+//     }
+//   }).then(function(rows) {
+//     var verifytoken = twoFactor.verifyToken(rows[0].secretkey, req.body.token);
+//     console.log(req.body.token)
+//     var newToken = twoFactor.generateToken(rows[0].secretkey)
+//     console.log(newToken)
+//     if (verifytoken !== null) {
+//       users.findOne({
+//         where: {
+//           username: [req.body.username]
+//         },
+//         attributes: ['id', 'username', 'password']
+//       }).then(user => 
+//         req.login(user, function (err) {
+//           if (err) {
+//             console.log('user',user)
+//             return res.redirect('back');
+//           }
+//           console.log('Logged user in using Passport req.login()');
+//           console.log('username',req.user.username);
+//           res.redirect('/')
+//         })
+//       ) 
+//     } else {
+//       console.log('wrong token')
+//       res.render('setting',{stoken: req.body.token, susername: req.body.username})
+//     }
+//   }).catch(error => {
+//     console.log('salah')
+//     res.render('setting',{stoken: req.body.token, susername: req.body.username})
+//   })
+// })
+
+
+router.post('/setting', function(req, res) {
+  if(req.body.two_fa == 'disable') {
+    user.update({
+      where: {
+        username: [req.user.username]
+      }
+    }).then(function(rows) {
+      alert("Two factor authenticated is disable");
+      res.render('/setting', {stwo_fa: req.body.two_fa})
+    })
+  } else if (req.body.two_fa == 'enable'){
+    user.findAll({
+      where: {
+        username: [req.user.username]
+      }
+    }).then(function(rows) {
+      if (rows[0].two_fa == 'enable') {
+        var newToken = twoFactor.generateToken(rows[0].secretkey)
+        console.log(newToken)
+        var newSecret = rows[0].secretkey
+        res.render('setting', {ssc: rows[0].url_qr, stwo_fa: req.body.two_fa})
     }
-  }).then(function(rows) {
-    var verifytoken = twoFactor.verifyToken(rows[0].secretkey, req.body.token);
-    console.log(req.body.token)
-    var newToken = twoFactor.generateToken(rows[0].secretkey)
-    console.log(newToken)
-    if (verifytoken !== null) {
-      users.findOne({
-        where: {
-          username: [req.body.username]
-        },
-        attributes: ['id', 'username', 'password']
-      }).then(user => 
-        req.login(user, function (err) {
-          if (err) {
-            console.log('user',user)
-            return res.redirect('back');
-          }
-          console.log('Logged user in using Passport req.login()');
-          console.log('username',req.user.username);
-          res.redirect('/')
-        })
-      ) 
-    } else {
-      console.log('wrong token')
-      res.render('setting',{stoken: req.body.token, susername: req.body.username})
-    }
-  }).catch(error => {
-    console.log('salah')
-    res.render('setting',{stoken: req.body.token, susername: req.body.username})
   })
-
-
+} 
 })
+
+router.post('/settingconfirm', function(req,res) {
+  users.update({
+    two_fa: 'enable'
+  }, { where: {
+    username: req.user.username
+  }}).then(function(rows) {
+    console.log("contooooh", req.user.username)
+    req.flash('success', 'Two-factor authentication is enabled')
+    res.render('setting')
+  })
+})
+
 
 router.get('/refresh', function(req, res, next) {
   res.redirect('/admin/setting');

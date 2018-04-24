@@ -9,7 +9,12 @@ const users = sequelize.define('users', {
   },
   username: Sequelize.STRING,
   password: Sequelize.STRING,
-  email: Sequelize.STRING
+  email: Sequelize.STRING,
+  pswd_token: Sequelize.STRING,
+  date_reset: Sequelize.DATE,
+  secret_key: Sequelize.STRING,
+  two_fa: Sequelize.ENUM('disable', 'enable'),
+  url_qr: Sequelize.STRING
 })
 
 module.exports = users;
