@@ -1,4 +1,5 @@
 # Simple Student Web Server Client 
+[![Build Status](https://travis-ci.org/Qisti/CRUD_HTML_Nodejs_with_Sequelize.svg?branch=master)](https://travis-ci.org/Qisti/CRUD_HTML_Nodejs_with_Sequelize)
 
 In this repo, we used: 
 
